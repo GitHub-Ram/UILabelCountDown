@@ -151,6 +151,7 @@ namespace CountDown
 
         private void init()
         {
+            lastelapsed = 0;
             stop = fixedStop;
             SetText();
         }
@@ -185,6 +186,7 @@ namespace CountDown
                     var elapsedTime = (int)ts.TotalMilliseconds;
                     if (elapsedTime > future)
                     {
+                        lastelapsed = 0;
                         try
                         {
                             SendEvent();
@@ -205,12 +207,16 @@ namespace CountDown
                     }
                     else
                     {
-                        if (elapsedTime % interval<20 && (elapsedTime - lastelapsed)>(interval-100))
+                        var sss = elapsedTime % interval;
+                        var diff = elapsedTime - lastelapsed;
+                        if (sss < 60 && (diff >(interval- sss)))
                         {
                             lastelapsed = elapsedTime;
                             try
                             {
-                                lastnumber = lastnumber + progression;
+                                var jump = Math.Round((double)diff / interval, MidpointRounding.AwayFromZero);
+                                for (int i= 0;i<jump;i++)
+                                    lastnumber += progression;
                                 if (isViewVisible && Alpha > 0 && !Hidden)
                                     Text = lastnumber.ToString();
                                 if (lastnumber == stop)
@@ -253,6 +259,7 @@ namespace CountDown
         {
             try
             {
+                lastelapsed = 0;
                 if (displayLink != null)
                 {
                     displayLink.Paused = true;
